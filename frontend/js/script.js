@@ -46,8 +46,7 @@ window.onload = function () {
         switch (value) {
             case 'box': {
                 for (var i = 1; i < gui.__controllers.length; i++) {
-                    gui.remove(gui.__controllers[i]);
-                    i--;
+                    gui.remove(gui.__controllers[i]); i--;
                 }
                 guiBoxParams.boxLength = gui.add(cubeControl, 'cubeLength', 0, 500);
                 guiBoxParams.boxHeight = gui.add(cubeControl, 'cubeHeight', 0, 500);
@@ -60,39 +59,15 @@ window.onload = function () {
                         var presentFigure = scene.getObjectByName('figure');
                         scene.remove(presentFigure);
                         scene.add(new Cube);
-
-                        fetch('http://localhost:3000/getProps', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(cubeControl),
-                            responseType: 'json',
-                        }).then((res) => {
-                            res.json().then((data) => {
-                                cubeControl.volume = data.volume;
-                                cubeControl.surfaceArea = data.surfaceArea;
-                                gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                                gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                                gui.add(cubeControl, 'volume');
-                                gui.add(cubeControl, 'surfaceArea');
-                            });
-                        }).catch((err) => {
-                            cubeControl.volume = 'connection error';
-                            cubeControl.surfaceArea = 'connection error';
-                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                            gui.add(cubeControl, 'volume');
-                            gui.add(cubeControl, 'surfaceArea');
-                        })
+                        makeRequest(cubeControl);
                     })
                 }
-
                 scene.add(new Cube);
                 break;
             }
             case 'cylinder': {
                 for (var i = 1; i < gui.__controllers.length; i++) {
-                    gui.remove(gui.__controllers[i]);
-                    i--;
+                    gui.remove(gui.__controllers[i]); i--;
                 }
                 guiCylParams.cylRadius = gui.add(cylinderControl, 'cylRadius', 1, 500);
                 guiCylParams.cylHeight = gui.add(cylinderControl, 'cylHeight', 0, 500);
@@ -104,29 +79,7 @@ window.onload = function () {
                         var presentFigure = scene.getObjectByName('figure');
                         scene.remove(presentFigure);
                         scene.add(new Cylinder);
-
-                        fetch('http://localhost:3000/getProps', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(cylinderControl),
-                            responseType: 'json',
-                        }).then((res) => {
-                            res.json().then((data) => {
-                                cylinderControl.volume = data.volume;
-                                cylinderControl.surfaceArea = data.surfaceArea;
-                                gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                                gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                                gui.add(cylinderControl, 'volume');
-                                gui.add(cylinderControl, 'surfaceArea');
-                            });
-                        }).catch((err) => {
-                            cylinderControl.volume = 'connection error';
-                            cylinderControl.surfaceArea = 'connection error';
-                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                            gui.add(cylinderControl, 'volume');
-                            gui.add(cylinderControl, 'surfaceArea');
-                        })
+                        makeRequest(cylinderControl);
                     })
                 }
 
@@ -135,8 +88,7 @@ window.onload = function () {
             }
             case 'sphere': {
                 for (var i = 1; i < gui.__controllers.length; i++) {
-                    gui.remove(gui.__controllers[i]);
-                    i--;
+                    gui.remove(gui.__controllers[i]); i--;
                 }
                 guiSphParams.sphRadius = gui.add(sphereControl, 'sphRadius', 0, 500);
                 gui.add(sphereControl, 'volume');
@@ -146,29 +98,7 @@ window.onload = function () {
                     var presentFigure = scene.getObjectByName('figure');
                     scene.remove(presentFigure);
                     scene.add(new Sphere);
-
-                    fetch('http://localhost:3000/getProps', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(sphereControl),
-                        responseType: 'json',
-                    }).then((res) => {
-                        res.json().then((data) => {
-                            sphereControl.volume = data.volume;
-                            sphereControl.surfaceArea = data.surfaceArea;
-                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                            gui.add(sphereControl, 'volume');
-                            gui.add(sphereControl, 'surfaceArea');
-                        });
-                    }).catch((err) => {
-                        sphereControl.volume = 'connection error';
-                        sphereControl.surfaceArea = 'connection error';
-                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                        gui.add(sphereControl, 'volume');
-                        gui.add(sphereControl, 'surfaceArea');
-                    })
+                    makeRequest(sphereControl);
                 })
                 scene.add(new Sphere);
                 break;
@@ -185,6 +115,32 @@ window.onload = function () {
     camera.position.set(-200, 200, 500);
     camera.lookAt(scene.position)
 
+
+    function makeRequest(control) {
+        fetch('http://localhost:3000/getProps', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(control),
+            responseType: 'json',
+        }).then((res) => {
+            res.json().then((data) => {
+                control.volume = data.volume;
+                control.surfaceArea = data.surfaceArea;
+                gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                gui.add(control, 'volume');
+                gui.add(control, 'surfaceArea');
+                console.log(cylinderControl);
+            });
+        }).catch(() => {
+            control.volume = 'connection error';
+            control.surfaceArea = 'connection error';
+            gui.remove(gui.__controllers[gui.__controllers.length - 1])
+            gui.remove(gui.__controllers[gui.__controllers.length - 1])
+            gui.add(control, 'volume');
+            gui.add(control, 'surfaceArea');
+        })
+    }
 
     function Cube() {
         var cubeGeometry = new THREE.CubeGeometry(cubeControl.cubeLength, cubeControl.cubeHeight, cubeControl.cubeWidth, 4, 4, 4);
