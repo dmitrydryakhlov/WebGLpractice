@@ -1,6 +1,7 @@
 # how to run:
 
 ## go to /backend 
- nmp start
+ 1) npm install
+ 2) nmp start
 ## go to /forntend 
  npm start or index.html
