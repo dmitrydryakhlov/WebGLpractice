@@ -7,13 +7,11 @@ var app = express()
 app.get('/', function (req, res) {
   res.send('Hello World')
 })
+
 app.use(cors());
 app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({extended: false}));
-
 
 app.use('/getProps', routes.getProps);
-
 
 app.listen(3000, function(){
     console.log(' listening on port 3000');

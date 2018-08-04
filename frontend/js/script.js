@@ -68,15 +68,21 @@ window.onload = function () {
                             responseType: 'json',
                         }).then((res) => {
                             res.json().then((data) => {
-                                console.log(data);
                                 cubeControl.volume = data.volume;
                                 cubeControl.surfaceArea = data.surfaceArea;
+                                gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                                gui.remove(gui.__controllers[gui.__controllers.length - 1])
                                 gui.add(cubeControl, 'volume');
                                 gui.add(cubeControl, 'surfaceArea');
                             });
+                        }).catch((err) => {
+                            cubeControl.volume = 'connection error';
+                            cubeControl.surfaceArea = 'connection error';
+                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                            gui.add(cubeControl, 'volume');
+                            gui.add(cubeControl, 'surfaceArea');
                         })
-                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
                     })
                 }
 
@@ -98,8 +104,6 @@ window.onload = function () {
                         var presentFigure = scene.getObjectByName('figure');
                         scene.remove(presentFigure);
                         scene.add(new Cylinder);
-                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
 
                         fetch('http://localhost:3000/getProps', {
                             method: 'POST',
@@ -110,9 +114,18 @@ window.onload = function () {
                             res.json().then((data) => {
                                 cylinderControl.volume = data.volume;
                                 cylinderControl.surfaceArea = data.surfaceArea;
+                                gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                                gui.remove(gui.__controllers[gui.__controllers.length - 1])
                                 gui.add(cylinderControl, 'volume');
                                 gui.add(cylinderControl, 'surfaceArea');
                             });
+                        }).catch((err) => {
+                            cylinderControl.volume = 'connection error';
+                            cylinderControl.surfaceArea = 'connection error';
+                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                            gui.add(cylinderControl, 'volume');
+                            gui.add(cylinderControl, 'surfaceArea');
                         })
                     })
                 }
@@ -133,8 +146,6 @@ window.onload = function () {
                     var presentFigure = scene.getObjectByName('figure');
                     scene.remove(presentFigure);
                     scene.add(new Sphere);
-                    gui.remove(gui.__controllers[gui.__controllers.length - 1])
-                    gui.remove(gui.__controllers[gui.__controllers.length - 1])
 
                     fetch('http://localhost:3000/getProps', {
                         method: 'POST',
@@ -145,9 +156,18 @@ window.onload = function () {
                         res.json().then((data) => {
                             sphereControl.volume = data.volume;
                             sphereControl.surfaceArea = data.surfaceArea;
+                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                            gui.remove(gui.__controllers[gui.__controllers.length - 1])
                             gui.add(sphereControl, 'volume');
                             gui.add(sphereControl, 'surfaceArea');
                         });
+                    }).catch((err) => {
+                        sphereControl.volume = 'connection error';
+                        sphereControl.surfaceArea = 'connection error';
+                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                        gui.add(sphereControl, 'volume');
+                        gui.add(sphereControl, 'surfaceArea');
                     })
                 })
                 scene.add(new Sphere);

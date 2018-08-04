@@ -1,9 +1,7 @@
-const Promise = require('promise');
 const out = {};
 
 out.getProps = (req, res) => {
     res.set('Content-Type', 'application/json');
-    console.log(req.body);
     switch (req.body.type) {
         case 'cube': {
             console.log('cube');
