@@ -5,12 +5,14 @@ window.onload = function () {
     canvas.setAttribute('height', window.innerHeight);
 
     var sphereControl = {
+        type: 'sphere',
         sphRadius: 75,
         volume: Math.PI * (75 ** 3),
         surfaceArea: 4 * Math.PI * 75 ** 2
     }
 
     var cubeControl = {
+        type: 'cube',
         cubeHeight: 100,
         cubeLength: 100,
         cubeWidth: 100,
@@ -19,6 +21,7 @@ window.onload = function () {
     }
 
     var cylinderControl = {
+        type: 'cylinder',
         cylHeight: 200,
         cylRadius: 75,
         volume: Math.PI * 200 * 75 ** 2,
@@ -58,15 +61,22 @@ window.onload = function () {
                         scene.remove(presentFigure);
                         scene.add(new Cube);
 
-                        cubeControl.volume = cubeControl.cubeHeight * cubeControl.cubeLength * cubeControl.cubeWidth;
-                        cubeControl.surfaceArea = 2 * (cubeControl.cubeHeight * cubeControl.cubeLength +
-                            cubeControl.cubeHeight * cubeControl.cubeWidth + cubeControl.cubeLength * cubeControl.cubeWidth);
-
+                        fetch('http://localhost:3000/getProps', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(cubeControl),
+                            responseType: 'json',
+                        }).then((res) => {
+                            res.json().then((data) => {
+                                console.log(data);
+                                cubeControl.volume = data.volume;
+                                cubeControl.surfaceArea = data.surfaceArea;
+                                gui.add(cubeControl, 'volume');
+                                gui.add(cubeControl, 'surfaceArea');
+                            });
+                        })
                         gui.remove(gui.__controllers[gui.__controllers.length - 1])
                         gui.remove(gui.__controllers[gui.__controllers.length - 1])
-
-                        gui.add(cubeControl, 'volume');
-                        gui.add(cubeControl, 'surfaceArea');
                     })
                 }
 
@@ -88,16 +98,22 @@ window.onload = function () {
                         var presentFigure = scene.getObjectByName('figure');
                         scene.remove(presentFigure);
                         scene.add(new Cylinder);
-
-                        cylinderControl.volume = cylinderControl.cylHeight * Math.PI * cylinderControl.cylRadius ** 2;
-                        cylinderControl.surfaceArea = 2 * Math.PI * cylinderControl.cylRadius *
-                            (cylinderControl.cylHeight + cylinderControl.cylRadius);
-
                         gui.remove(gui.__controllers[gui.__controllers.length - 1])
                         gui.remove(gui.__controllers[gui.__controllers.length - 1])
 
-                        gui.add(cylinderControl, 'volume');
-                        gui.add(cylinderControl, 'surfaceArea');
+                        fetch('http://localhost:3000/getProps', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(cylinderControl),
+                            responseType: 'json',
+                        }).then((res) => {
+                            res.json().then((data) => {
+                                cylinderControl.volume = data.volume;
+                                cylinderControl.surfaceArea = data.surfaceArea;
+                                gui.add(cylinderControl, 'volume');
+                                gui.add(cylinderControl, 'surfaceArea');
+                            });
+                        })
                     })
                 }
 
@@ -112,19 +128,27 @@ window.onload = function () {
                 guiSphParams.sphRadius = gui.add(sphereControl, 'sphRadius', 0, 500);
                 gui.add(sphereControl, 'volume');
                 gui.add(sphereControl, 'surfaceArea');
+
                 guiSphParams.sphRadius.onFinishChange(function () {
                     var presentFigure = scene.getObjectByName('figure');
                     scene.remove(presentFigure);
                     scene.add(new Sphere);
-
                     gui.remove(gui.__controllers[gui.__controllers.length - 1])
                     gui.remove(gui.__controllers[gui.__controllers.length - 1])
 
-                    sphereControl.volume = Math.PI * sphereControl.sphRadius ** 3;
-                    sphereControl.surfaceArea = 4 * Math.PI * sphereControl.sphRadius ** 2;
-
-                    gui.add(sphereControl, 'volume');
-                    gui.add(sphereControl, 'surfaceArea');
+                    fetch('http://localhost:3000/getProps', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sphereControl),
+                        responseType: 'json',
+                    }).then((res) => {
+                        res.json().then((data) => {
+                            sphereControl.volume = data.volume;
+                            sphereControl.surfaceArea = data.surfaceArea;
+                            gui.add(sphereControl, 'volume');
+                            gui.add(sphereControl, 'surfaceArea');
+                        });
+                    })
                 })
                 scene.add(new Sphere);
                 break;
