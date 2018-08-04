@@ -2,6 +2,6 @@
 
 ## go to /backend 
  1) npm install
- 2) nmp start
-## go to /forntend 
+ 2) npm start
+## go to /frontend 
  npm start or index.html
