@@ -12,6 +12,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/getProps', routes.getProps);
+app.use('/triangulation', routes.triangulation);
 
 app.listen(3000, function(){
     console.log(' listening on port 3000');

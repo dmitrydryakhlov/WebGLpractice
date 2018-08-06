@@ -20,6 +20,14 @@ window.onload = function () {
         surfaceArea: 2 * (100 * 100 + 100 * 100 + 100 * 100)
     }
 
+    var trngControl = {
+        type: 'triangulation',
+        trngHeight: 100,
+        trngLength: 100,
+        trngWidth: 100,
+        error: '' 
+    }
+
     var cylinderControl = {
         type: 'cylinder',
         cylHeight: 200,
@@ -28,22 +36,38 @@ window.onload = function () {
         surfaceArea: 2 * Math.PI * 75 * (200 + 75)
     }
 
-    var text = {
-        typeOfFigure: ''
-    }
 
     var gui = new dat.GUI();
-    var typeController = gui.add(text, 'typeOfFigure', ['box', 'cylinder', 'sphere']);
+
+    var text = { typeOfFigure: '' }
+    var typeController = gui.add(text, 'typeOfFigure', ['box', 'cylinder', 'sphere', 'triangulation']);
 
     var guiBoxParams = {}
     var guiCylParams = {}
     var guiSphParams = {}
-
+    var guiTrnParams = {}
 
     typeController.onChange(function (value) {
         var presentFigure = scene.getObjectByName('figure');
         scene.remove(presentFigure);
         switch (value) {
+            case 'triangulation': {
+                for (var i = 1; i < gui.__controllers.length; i++) {
+                    gui.remove(gui.__controllers[i]); i--;
+                }
+                guiTrnParams.trngLength = gui.add(trngControl, 'trngLength', 0, 500);
+                guiTrnParams.trngHeight = gui.add(trngControl, 'trngHeight', 0, 500);
+                guiTrnParams.trngWidth = gui.add(trngControl, 'trngWidth', 0, 500);
+
+                for (var item in guiTrnParams) {
+                    guiTrnParams[item].onFinishChange(function () {
+                        var presentFigure = scene.getObjectByName('figure');
+                        scene.remove(presentFigure);
+                        makeRequest(trngControl, 'triangulation');
+                    })
+                }
+                break;
+            }
             case 'box': {
                 for (var i = 1; i < gui.__controllers.length; i++) {
                     gui.remove(gui.__controllers[i]); i--;
@@ -59,9 +83,10 @@ window.onload = function () {
                         var presentFigure = scene.getObjectByName('figure');
                         scene.remove(presentFigure);
                         scene.add(new Cube);
-                        makeRequest(cubeControl);
+                        makeRequest(cubeControl, 'getProps');
                     })
                 }
+
                 scene.add(new Cube);
                 break;
             }
@@ -79,7 +104,7 @@ window.onload = function () {
                         var presentFigure = scene.getObjectByName('figure');
                         scene.remove(presentFigure);
                         scene.add(new Cylinder);
-                        makeRequest(cylinderControl);
+                        makeRequest(cylinderControl, 'getProps');
                     })
                 }
 
@@ -98,8 +123,9 @@ window.onload = function () {
                     var presentFigure = scene.getObjectByName('figure');
                     scene.remove(presentFigure);
                     scene.add(new Sphere);
-                    makeRequest(sphereControl);
+                    makeRequest(sphereControl, 'getProps');
                 })
+
                 scene.add(new Sphere);
                 break;
             }
@@ -116,29 +142,50 @@ window.onload = function () {
     camera.lookAt(scene.position)
 
 
-    function makeRequest(control) {
-        fetch('http://localhost:3000/getProps', {
+    function makeRequest(control, adress) {
+        fetch('http://localhost:3000/' + adress, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(control),
             responseType: 'json',
         }).then((res) => {
             res.json().then((data) => {
-                control.volume = data.volume;
-                control.surfaceArea = data.surfaceArea;
+                switch (data.type) {
+                    case 'props': {
+                        control.volume = data.volume;
+                        control.surfaceArea = data.surfaceArea;
+                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                        gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                        gui.add(control, 'volume');
+                        gui.add(control, 'surfaceArea');
+                        break;
+                    }
+                    case 'triangulation': {
+                        if (gui.__controllers.length == 5) {
+                            gui.remove(gui.__controllers[gui.__controllers.length - 1])        
+                        }
+                        scene.add(new Triangulation(data.vertices));
+                        break;
+                    }
+                }
+            });
+        }).catch(() => {
+            if (control.type === 'triangulation') {
+                control.error = 'connection error';
+                if (gui.__controllers.length == 5) {
+                    gui.remove(gui.__controllers[gui.__controllers.length - 1])
+                    gui.add(control, 'error');
+                } else {
+                    gui.add(control, 'error');
+                }
+            } else {
+                control.volume = 'connection error';
+                control.surfaceArea = 'connection error';
                 gui.remove(gui.__controllers[gui.__controllers.length - 1])
                 gui.remove(gui.__controllers[gui.__controllers.length - 1])
                 gui.add(control, 'volume');
                 gui.add(control, 'surfaceArea');
-                console.log(cylinderControl);
-            });
-        }).catch(() => {
-            control.volume = 'connection error';
-            control.surfaceArea = 'connection error';
-            gui.remove(gui.__controllers[gui.__controllers.length - 1])
-            gui.remove(gui.__controllers[gui.__controllers.length - 1])
-            gui.add(control, 'volume');
-            gui.add(control, 'surfaceArea');
+            }
         })
     }
 
@@ -171,6 +218,15 @@ window.onload = function () {
         return sphere;
     }
 
+    function Triangulation(data) {
+        var geometry = new THREE.BufferGeometry();
+        var vertices = new Float32Array(data);
+        geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+        var material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.name = 'figure'
+        return mesh;
+    }
     function loop() {
         renderer.render(scene, camera);
         requestAnimationFrame(function () { loop(); });
